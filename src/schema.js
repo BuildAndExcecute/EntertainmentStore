@@ -116,7 +116,7 @@ export const movies = pgTable("movies", {
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
 
-  videoUrl: text("video_url").notNull(),
+  videoPublicId: text("video_public_id").notNull(),
   thumbnailUrl: text("thumbnail_url").notNull(),
   bannerUrl: text("banner_url").notNull(),
 
