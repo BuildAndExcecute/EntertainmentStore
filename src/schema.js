@@ -7,7 +7,8 @@ import {
   unique,
   pgEnum,
   boolean,
-  index
+  index,
+  primaryKey
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -25,8 +26,7 @@ export const user = pgTable("user", {
     .notNull(),
   role: text("role", { enum: ["user", "admin"] })
     .default("user")
-    .notNull(),
-  username: text("username").notNull(),
+    .notNull()
 });
 
 export const session = pgTable(
@@ -182,4 +182,48 @@ export const movieFeedbacks = pgTable(
     userIdx: index("movie_feedbacks_user_idx").on(table.userId),
     movieIdx: index("movie_feedbacks_movie_idx").on(table.movieId),
   })
+);
+
+export const favouriteList = pgTable(
+  "favourite_list",
+  {
+    userId: varchar("user_id", { length: 26 })
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+
+    movieId: varchar("movie_id", { length: 26 })
+      .notNull()
+      .references(() => movies.id, { onDelete: "cascade" }),
+
+    createdAt: timestamp("created_at")
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.userId, table.movieId],
+    }),
+  ]
+);
+
+export const watchedList = pgTable(
+  "watched_list",
+  {
+    userId: varchar("user_id", { length: 26 })
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+
+    movieId: varchar("movie_id", { length: 26 })
+      .notNull()
+      .references(() => movies.id, { onDelete: "cascade" }),
+
+    watchedAt: timestamp("watched_at")
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.userId, table.movieId],
+    }),
+  ]
 );

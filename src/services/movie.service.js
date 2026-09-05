@@ -95,12 +95,12 @@ export const playMovie = async (id, userId) => {
         return null;
     }
 
-    const signedVideoUrl = cloudinary.url(movie.publicId, {
+    const videoUrl = cloudinary.url(movie.publicId, {
         resource_type: "video",
-        type: "authenticated",
-        sign_url: true,
-        expires_at: Math.floor(Date.now() / 1000) + 60 * 30, // 15 min
+        type: "upload",
+        secure: true,
     });
+
 
 
     // still track "watched" status separately (first watch only), if you want it
@@ -131,7 +131,7 @@ export const playMovie = async (id, userId) => {
         }
     }
 
-    return { videoUrl: signedVideoUrl };
+    return { videoUrl: videoUrl };
 };
 
 
@@ -198,3 +198,34 @@ export const editMovie = async (id, { title, description }, files) => {
 
     return movie;
 };
+
+export const likeMovie = async (movieId) => {
+  const [movie] = await db
+    .update(movies)
+    .set({
+      likes: sql`${movies.likes} + 1`,
+    })
+    .where(eq(movies.id, movieId))
+    .returning({
+      id: movies.id,
+      likes: movies.likes,
+    });
+
+  return movie;
+};
+
+export const dislikeMovie = async (movieId) => {
+  const [movie] = await db
+    .update(movies)
+    .set({
+      dislikes: sql`${movies.dislikes} + 1`,
+    })
+    .where(eq(movies.id, movieId))
+    .returning({
+      id: movies.id,
+      dislikes: movies.dislikes,
+    });
+
+  return movie;
+};
+

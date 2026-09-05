@@ -9,11 +9,19 @@ import { auth } from "./config/auth.config.js"
 
 import movieRouter from "./routes/movies.routes.js"
 import userRouter from "./routes/user.routes.js"
+import cors from "cors";
 import feedbackRouter from "./routes/feedback.routes.js"
+
 
 
 const app = express()
 
+const CLIENT_URL = process.env.CLIENT_URL;
+ 
+if (!CLIENT_URL)  throw new Error("CLIENT_URL is not defined in environment variables"); 
+
+
+app.use( cors({ origin: CLIENT_URL, credentials: true, }), );
 
 async function startServer() {
     try {
@@ -24,7 +32,7 @@ async function startServer() {
         app.use(express.json())
 
         app.use("/api/v1/movies", movieRouter)
-        app.use("api/v1/user", userRouter)
+        app.use("/api/v1/user", userRouter)
         app.use("/api/v1/feedback", feedbackRouter)
 
         console.log("DataBase Connected Successfully")
